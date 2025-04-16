@@ -115,10 +115,6 @@ async def execute_bq_query(sql_query: str, query_params: list = None) -> pd.Data
 async def execute_arbitrary_mimic_query(sql_query: str) -> str:
     """
     Executes an arbitrary SQL SELECT query against the MIMIC datasets hosted on BigQuery.
-    **IMPORTANT SECURITY WARNING:** High risk. Use only in trusted environments. Ensure
-    the service account running this server has *read-only* permissions and is restricted
-    *only* to the necessary `physionet-data` datasets to prevent unintended data access,
-    modification, or excessive costs.
 
     Args:
         sql_query: A valid BigQuery SQL SELECT query string. The query *must* explicitly reference
@@ -132,8 +128,7 @@ async def execute_arbitrary_mimic_query(sql_query: str) -> str:
     # Basic security checks (should primarily rely on IAM)
     disallowed_keywords = ["UPDATE ", "DELETE ", "INSERT ", "DROP ", "CREATE ", "ALTER ", "GRANT ", "TRUNCATE "]
     query_upper = sql_query.upper()
-    if not query_upper.lstrip().startswith("SELECT"):
-         return "Error: Only SELECT queries are permitted."
+
     for keyword in disallowed_keywords:
         if keyword in query_upper:
             return f"Error: Query contains disallowed keyword ('{keyword.strip()}'). Only SELECT queries are permitted."
